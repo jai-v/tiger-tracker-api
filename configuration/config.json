@@ -1,0 +1,9 @@
+{
+  "environment": "local",
+  "listenPort": "8080",
+  "dbConnectionPool": {
+    "maxOpenConnections": 100,
+    "maxIdleConnections": 5,
+    "maxConnectionLifetimeInMinutes": 3
+  }
+}
