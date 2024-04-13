@@ -1,0 +1,77 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+                   xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd
+                   http://www.liquibase.org/xml/ns/pro
+                   http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd
+                   http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="1" author="jaikumar">
+        <createTable tableName="user_details">
+            <column name="id" type="int">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="user_name" type="varchar(255)">
+                <constraints unique="true" nullable="false"/>
+            </column>
+            <column name="password_hash" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="email" type="varchar(255)">
+                <constraints unique="true" nullable="false"/>
+            </column>
+        </createTable>
+        <addAutoIncrement columnName="id" tableName="user_details" columnDataType="int" startWith="1"/>
+        <createIndex indexName="idx_user_name" tableName="user_details">
+            <column name="user_name"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="2" author="jaikumar">
+        <createTable tableName="tiger_details">
+            <column name="id" type="int">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="dob" type="date">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_seen" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_position" type="point">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addAutoIncrement columnName="id" tableName="tiger_details" columnDataType="int" startWith="1"/>
+    </changeSet>
+
+    <changeSet id="3" author="jaikumar">
+        <createTable tableName="tiger_sightings">
+            <column name="id" type="int">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="last_seen" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_position" type="point">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_id" type="int">
+                <constraints nullable="false" foreignKeyName="fk_user_details" references="user_details(id)"/>
+            </column>
+            <column name="image" type="blob"/>
+        </createTable>
+        <addAutoIncrement columnName="id" tableName="tiger_sightings" columnDataType="int" startWith="1"/>
+        <createIndex indexName="idx_last_position" tableName="tiger_sightings">
+            <column name="last_position"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

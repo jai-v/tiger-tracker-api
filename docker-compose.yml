@@ -1,0 +1,38 @@
+version: '3.8'
+services:
+  db:
+    image: mysql:8.0
+    cap_add:
+      - SYS_NICE
+    restart: always
+    environment:
+      - MYSQL_DATABASE=tigerhall
+      - MYSQL_USER=tiger
+      - MYSQL_PASSWORD=kitten
+      - MYSQL_ROOT_PASSWORD=password
+    ports:
+      - '3306:3306'
+    volumes:
+      - db:/var/lib/mysql
+
+  db-migrate:
+    image: liquibase/liquibase
+    volumes:
+      - ./migrations:/liquibase/changelog
+      - ./migrations/lib/mysql-connector-java-8.0.30.jar:/liquibase/lib/mysql-connector-java-8.0.30.jar
+    command: [
+      "--url=jdbc:mysql://db:3306/tigerhall",
+      "--username=tiger",
+      "--password=kitten",
+      "--driver=com.mysql.cj.jdbc.Driver",
+      "--classpath=changelog/lib/mysql-connector-java-8.0.30.jar",
+      "--contexts=local",
+      "--changelog-file=changelog/changelog.xml",
+      "update"
+    ]
+    depends_on:
+      - db
+
+volumes:
+  db:
+    driver: local
