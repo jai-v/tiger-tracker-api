@@ -33,6 +33,26 @@ services:
     depends_on:
       - mysqldb
 
+  tiger-tracker-api:
+    image: tiger-tracker-api
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - '8080:8080'
+    environment:
+      - DB_HOST=mysqldb
+      - DB_PORT=3306
+      - DB_USER=tiger
+      - DB_PASSWORD=kitten
+      - DB_NAME=tigerhall
+    depends_on:
+      - mysqldb-migrate
+    working_dir: /home/tigerhall
+    volumes:
+      - ./configuration:/home/tigerhall/configuration
+    command: [ "./tiger-tracker-api" ]
+
 volumes:
   mysqldb:
     driver: local
