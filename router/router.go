@@ -5,11 +5,14 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	_ "github.com/go-sql-driver/mysql"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 	"os"
 	"tiger-tracker-api/configuration"
 	"tiger-tracker-api/configuration/models"
 	"tiger-tracker-api/constants"
 	"tiger-tracker-api/controller"
+	"tiger-tracker-api/docs"
 	"tiger-tracker-api/logging"
 )
 
@@ -40,8 +43,20 @@ func Init(configData *configuration.ConfigData) *gin.Engine {
 		logger.Fatalf("could not ping db, error:%v", pingErr)
 	}
 
-	router := gin.New()
+	r := gin.New()
 	health := controller.NewHealthCheckController()
-	router.GET("/tiger-tracker/api/health", health.Status)
-	return router
+
+	routerGroup := r.Group("/api")
+	{
+		docs.SwaggerInfo.Title = "Tiger Tracker API"
+		docs.SwaggerInfo.Description = "Tiger Tracker API Server for tracking the population of tigers in the wild"
+		docs.SwaggerInfo.BasePath = "/api/tiger-tracker/v1"
+		if configData.Environment != "prod" {
+			routerGroup.GET("/tiger-tracker/v1/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+		}
+
+		routerGroup.GET("/tiger-tracker/health", health.Status)
+	}
+
+	return r
 }

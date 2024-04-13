@@ -1,0 +1,15 @@
+info:
+  contact: {}
+paths:
+  /api/tiger-tracker/v1/health:
+    get:
+      description: Confirms if the API Service is up and running
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: OK
+      summary: Checks API Service health
+      tags:
+      - Health
+swagger: "2.0"
