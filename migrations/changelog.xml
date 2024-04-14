@@ -87,4 +87,8 @@
         <dropColumn tableName="tiger_details" columnName="last_position"/>
     </changeSet>
 
+    <changeSet id="6" author="jaikumar">
+        <addUniqueConstraint tableName="tiger_details" columnNames="name"/>
+    </changeSet>
+
 </databaseChangeLog>
