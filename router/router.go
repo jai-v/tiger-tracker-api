@@ -14,6 +14,8 @@ import (
 	"tiger-tracker-api/controller"
 	"tiger-tracker-api/docs"
 	"tiger-tracker-api/logging"
+	"tiger-tracker-api/repository"
+	"tiger-tracker-api/service"
 )
 
 func InitDB(poolConfig models.DbConnectionPool) (*sqlx.DB, error) {
@@ -45,7 +47,9 @@ func Init(configData *configuration.ConfigData) *gin.Engine {
 	}
 
 	r := gin.New()
-	appController := controller.NewAppController()
+	appRepository := repository.NewAppRepository(db)
+	appService := service.NewAppService(appRepository)
+	appController := controller.NewAppController(appService)
 
 	routerGroup := r.Group("/api")
 	{
@@ -57,6 +61,7 @@ func Init(configData *configuration.ConfigData) *gin.Engine {
 		}
 
 		routerGroup.GET("/tiger-tracker/health", appController.HealthCheck)
+		routerGroup.GET("/tiger-tracker/v1/tigers", appController.ListAllTigers)
 	}
 
 	return r
