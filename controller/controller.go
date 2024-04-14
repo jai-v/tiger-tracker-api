@@ -5,15 +5,15 @@ import (
 	"net/http"
 )
 
-type HealthCheckController interface {
-	Status(ctx *gin.Context)
+type AppController interface {
+	HealthCheck(ctx *gin.Context)
 }
 
-type healthCheckController struct {
+type appController struct {
 }
 
-func NewHealthCheckController() HealthCheckController {
-	return healthCheckController{}
+func NewAppController() AppController {
+	return appController{}
 }
 
 // Get API health
@@ -23,6 +23,6 @@ func NewHealthCheckController() HealthCheckController {
 // @Produce plain
 // @Success 200
 // @Router /api/tiger-tracker/v1/health [get]
-func (h healthCheckController) Status(ctx *gin.Context) {
+func (h appController) HealthCheck(ctx *gin.Context) {
 	ctx.String(http.StatusOK, "Service is up and running")
 }

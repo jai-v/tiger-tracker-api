@@ -45,7 +45,7 @@ func Init(configData *configuration.ConfigData) *gin.Engine {
 	}
 
 	r := gin.New()
-	health := controller.NewHealthCheckController()
+	appController := controller.NewAppController()
 
 	routerGroup := r.Group("/api")
 	{
@@ -56,7 +56,7 @@ func Init(configData *configuration.ConfigData) *gin.Engine {
 			routerGroup.GET("/tiger-tracker/v1/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 		}
 
-		routerGroup.GET("/tiger-tracker/health", health.Status)
+		routerGroup.GET("/tiger-tracker/health", appController.HealthCheck)
 	}
 
 	return r
