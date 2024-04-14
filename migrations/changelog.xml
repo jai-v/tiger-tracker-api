@@ -74,4 +74,17 @@
         </createIndex>
     </changeSet>
 
+    <changeSet id="4" author="jaikumar">
+       <addColumn tableName="tiger_sightings">
+           <column name="tiger_id" type="int">
+               <constraints nullable="false" foreignKeyName="fk_tiger_details" references="tiger_details(id)" />
+           </column>
+       </addColumn>
+    </changeSet>
+
+    <changeSet id="5" author="jaikumar">
+        <dropColumn tableName="tiger_details" columnName="last_seen"/>
+        <dropColumn tableName="tiger_details" columnName="last_position"/>
+    </changeSet>
+
 </databaseChangeLog>
