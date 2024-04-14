@@ -1,10 +1,10 @@
 package router
 
 import (
-	"database/sql"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/jmoiron/sqlx"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 	"os"
@@ -16,14 +16,15 @@ import (
 	"tiger-tracker-api/logging"
 )
 
-func InitDB(poolConfig models.DbConnectionPool) (*sql.DB, error) {
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s",
+func InitDB(poolConfig models.DbConnectionPool) (*sqlx.DB, error) {
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true",
 		os.Getenv(constants.DB_USER),
 		os.Getenv(constants.DB_PASSWORD),
 		os.Getenv(constants.DB_HOST),
 		os.Getenv(constants.DB_PORT),
 		os.Getenv(constants.DB_NAME))
-	db, err := sql.Open("mysql", dsn)
+
+	db, err := sqlx.Open("mysql", dsn)
 	if err != nil {
 		return nil, err
 	}
