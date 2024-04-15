@@ -6,6 +6,8 @@ import (
 	"tiger-tracker-api/repository/models"
 )
 
+//go:generate mockgen -source=./repository.go -destination=./mocks/mock_repository.go -package=mocks
+
 type AppRepository interface {
 	GetRecentTigerSightings(ctx *gin.Context, pageNumber, pageSize int) ([]models.TigerDetailWithSightings, error)
 }
