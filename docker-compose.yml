@@ -6,12 +6,12 @@ services:
       - SYS_NICE
     restart: always
     environment:
-      - MYSQL_DATABASE=tigerhall
-      - MYSQL_USER=tiger
-      - MYSQL_PASSWORD=kitten
-      - MYSQL_ROOT_PASSWORD=password
+      - MYSQL_DATABASE=$DB_NAME
+      - MYSQL_USER=$DB_USER
+      - MYSQL_PASSWORD=$DB_PASSWORD
+      - MYSQL_ROOT_PASSWORD=$DB_ROOT_PASSWORD
     ports:
-      - '3306:3306'
+      - "${DB_PORT}:3306"
     volumes:
       - mysqldb:/var/lib/mysql
 
@@ -19,14 +19,17 @@ services:
     image: liquibase/liquibase
     volumes:
       - ./migrations:/liquibase/changelog
+      - ./migrations/resources:/liquibase/changelog/resources
       - ./migrations/lib/mysql-connector-java-8.0.30.jar:/liquibase/lib/mysql-connector-java-8.0.30.jar
+    environment:
+      - MIGRATION_CONTEXT=$MIGRATION_CONTEXT
     command: [
-      "--url=jdbc:mysql://mysqldb:3306/tigerhall",
-      "--username=tiger",
-      "--password=kitten",
+      "--url=jdbc:mysql://mysqldb:$DB_PORT/$DB_NAME",
+      "--username=$DB_USER",
+      "--password=$DB_PASSWORD",
       "--driver=com.mysql.cj.jdbc.Driver",
       "--classpath=changelog/lib/mysql-connector-java-8.0.30.jar",
-      "--contexts=local",
+      "--contexts=$MIGRATION_CONTEXT",
       "--changelog-file=changelog/changelog.xml",
       "update"
     ]
@@ -42,10 +45,10 @@ services:
       - '8080:8080'
     environment:
       - DB_HOST=mysqldb
-      - DB_PORT=3306
-      - DB_USER=tiger
-      - DB_PASSWORD=kitten
-      - DB_NAME=tigerhall
+      - DB_PORT=$DB_PORT
+      - DB_USER=$DB_USER
+      - DB_PASSWORD=$DB_PASSWORD
+      - DB_NAME=$DB_NAME
     depends_on:
       - mysqldb-migrate
     working_dir: /home/tigerhall
