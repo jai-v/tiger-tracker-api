@@ -4,7 +4,7 @@
         "contact": {}
     },
     "paths": {
-        "/api/tiger-tracker/v1/health": {
+        "/v1/health": {
             "get": {
                 "description": "Confirms if the API Service is up and running",
                 "produces": [
@@ -18,6 +18,120 @@
                     "200": {
                         "description": "OK"
                     }
+                }
+            }
+        },
+        "/v1/tigers": {
+            "get": {
+                "description": "It is a paginated endpoint. The tigers are sorted by the last time they were seen.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Tigers"
+                ],
+                "summary": "Returns a list of all the tigers with their details.",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "page number",
+                        "name": "pageNo",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "page size",
+                        "name": "pageSize",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.ListTigersResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/apiError.APIError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/apiError.APIError"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "apiError.APIError": {
+            "type": "object",
+            "properties": {
+                "errorCode": {
+                    "$ref": "#/definitions/apiError.ErrorCode"
+                },
+                "errorMessage": {
+                    "type": "string"
+                }
+            }
+        },
+        "apiError.ErrorCode": {
+            "type": "string",
+            "enum": [
+                "ERR_BAD_REQUEST",
+                "ERR_INTERNAL_SERVER_ERROR"
+            ],
+            "x-enum-varnames": [
+                "BadRequestErrorCode",
+                "InternalServerErrorCode"
+            ]
+        },
+        "models.ListTigersResponse": {
+            "type": "object",
+            "properties": {
+                "tigers": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.TigerDetailWithSightings"
+                    }
+                }
+            }
+        },
+        "models.Location": {
+            "type": "object",
+            "properties": {
+                "latitude": {
+                    "type": "number"
+                },
+                "longitude": {
+                    "type": "number"
+                }
+            }
+        },
+        "models.TigerDetailWithSightings": {
+            "type": "object",
+            "properties": {
+                "dob": {
+                    "type": "string"
+                },
+                "lastPosition": {
+                    "$ref": "#/definitions/models.Location"
+                },
+                "lastSeen": {
+                    "type": "string"
+                },
+                "tigerId": {
+                    "type": "integer"
+                },
+                "tigerName": {
+                    "type": "string"
                 }
             }
         }

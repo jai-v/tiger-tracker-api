@@ -30,7 +30,7 @@ func NewAppController(appService service.AppService) AppController {
 // @Description Confirms if the API Service is up and running
 // @Produce plain
 // @Success 200
-// @Router /api/tiger-tracker/v1/health [get]
+// @Router /v1/health [get]
 func (h appController) HealthCheck(ctx *gin.Context) {
 	ctx.String(http.StatusOK, "Service is up and running")
 }
@@ -48,6 +48,17 @@ func (h appController) readQueryParamAsInt(ctx *gin.Context, name string) (int, 
 	return intValue, nil
 }
 
+// Get All Tigers
+// @Tags Tigers
+// @Summary Returns a list of all the tigers with their details.
+// @Description It is a paginated endpoint. The tigers are sorted by the last time they were seen.
+// @Produce json
+// @Param pageNo query int true "page number"
+// @Param pageSize query int true "page size"
+// @Success 200 {object} models.ListTigersResponse
+// @Failure 400 {object} apiError.APIError
+// @Failure 500 {object} apiError.APIError
+// @Router /v1/tigers [get]
 func (h appController) ListAllTigers(ctx *gin.Context) {
 	pageNo, err := h.readQueryParamAsInt(ctx, "pageNo")
 	if err != nil {

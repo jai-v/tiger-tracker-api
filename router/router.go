@@ -55,7 +55,7 @@ func Init(configData *configuration.ConfigData) *gin.Engine {
 	{
 		docs.SwaggerInfo.Title = "Tiger Tracker API"
 		docs.SwaggerInfo.Description = "Tiger Tracker API Server for tracking the population of tigers in the wild"
-		docs.SwaggerInfo.BasePath = "/api/tiger-tracker/v1"
+		docs.SwaggerInfo.BasePath = "/api/tiger-tracker"
 		if configData.Environment != "prod" {
 			routerGroup.GET("/tiger-tracker/v1/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 		}

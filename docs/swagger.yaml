@@ -1,7 +1,50 @@
+definitions:
+  apiError.APIError:
+    properties:
+      errorCode:
+        $ref: '#/definitions/apiError.ErrorCode'
+      errorMessage:
+        type: string
+    type: object
+  apiError.ErrorCode:
+    enum:
+    - ERR_BAD_REQUEST
+    - ERR_INTERNAL_SERVER_ERROR
+    type: string
+    x-enum-varnames:
+    - BadRequestErrorCode
+    - InternalServerErrorCode
+  models.ListTigersResponse:
+    properties:
+      tigers:
+        items:
+          $ref: '#/definitions/models.TigerDetailWithSightings'
+        type: array
+    type: object
+  models.Location:
+    properties:
+      latitude:
+        type: number
+      longitude:
+        type: number
+    type: object
+  models.TigerDetailWithSightings:
+    properties:
+      dob:
+        type: string
+      lastPosition:
+        $ref: '#/definitions/models.Location'
+      lastSeen:
+        type: string
+      tigerId:
+        type: integer
+      tigerName:
+        type: string
+    type: object
 info:
   contact: {}
 paths:
-  /api/tiger-tracker/v1/health:
+  /v1/health:
     get:
       description: Confirms if the API Service is up and running
       produces:
@@ -12,4 +55,37 @@ paths:
       summary: Checks API Service health
       tags:
       - Health
+  /v1/tigers:
+    get:
+      description: It is a paginated endpoint. The tigers are sorted by the last time
+        they were seen.
+      parameters:
+      - description: page number
+        in: query
+        name: pageNo
+        required: true
+        type: integer
+      - description: page size
+        in: query
+        name: pageSize
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ListTigersResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/apiError.APIError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/apiError.APIError'
+      summary: Returns a list of all the tigers with their details.
+      tags:
+      - Tigers
 swagger: "2.0"
