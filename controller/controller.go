@@ -30,11 +30,11 @@ func NewAppController(appService service.AppService) AppController {
 // @Produce plain
 // @Success 200
 // @Router /v1/health [get]
-func (h appController) HealthCheck(ctx *gin.Context) {
+func (ac appController) HealthCheck(ctx *gin.Context) {
 	ctx.String(http.StatusOK, "Service is up and running")
 }
 
-func (h appController) readQueryParamAsInt(ctx *gin.Context, name string) (int, error) {
+func (ac appController) readQueryParamAsInt(ctx *gin.Context, name string) (int, error) {
 	strValue, exists := ctx.GetQuery(name)
 	if !exists {
 		return 0, errors.New(fmt.Sprintf("%s query param is missing", name))
@@ -58,19 +58,19 @@ func (h appController) readQueryParamAsInt(ctx *gin.Context, name string) (int, 
 // @Failure 400 {object} apiError.APIError
 // @Failure 500 {object} apiError.APIError
 // @Router /v1/tigers [get]
-func (h appController) ListAllTigers(ctx *gin.Context) {
-	pageNo, err := h.readQueryParamAsInt(ctx, "pageNo")
+func (ac appController) ListAllTigers(ctx *gin.Context) {
+	pageNo, err := ac.readQueryParamAsInt(ctx, "pageNo")
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, apiError.BadRequestError)
 		return
 	}
-	pageSize, err := h.readQueryParamAsInt(ctx, "pageSize")
+	pageSize, err := ac.readQueryParamAsInt(ctx, "pageSize")
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, apiError.BadRequestError)
 		return
 	}
 
-	response, err := h.appService.GetAllTigersWithRecentSightingsFirst(ctx, pageNo, pageSize)
+	response, err := ac.appService.GetAllTigersWithRecentSightingsFirst(ctx, pageNo, pageSize)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, apiError.InternalServerError)
 		return
