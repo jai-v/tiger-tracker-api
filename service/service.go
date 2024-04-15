@@ -8,6 +8,8 @@ import (
 	serviceModels "tiger-tracker-api/service/models"
 )
 
+//go:generate mockgen -source=./service.go -destination=./mocks/mock_service.go -package=mocks
+
 type AppService interface {
 	GetAllTigersWithRecentSightingsFirst(ctx *gin.Context, pageNumber, pageSize int) (serviceModels.ListTigersResponse, error)
 }
