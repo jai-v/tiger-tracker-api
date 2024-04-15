@@ -31,7 +31,7 @@ func (g *Location) Scan(src interface{}) error {
 		if err != nil {
 			return err
 		}
-		*g = Location{latitude, longitude}
+		*g = Location{Latitude: latitude, Longitude: longitude}
 	default:
 		return errors.New(fmt.Sprintf("Expected []byte for Location type, got  %T", src))
 	}

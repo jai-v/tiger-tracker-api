@@ -41,7 +41,7 @@ func (suite *AppServiceTestSuite) TestListALlTigers_WhenRepositoryReturnsRespons
 		TigerName:    "raja",
 		DateOfBirth:  time.Time{},
 		LastSeen:     time.Time{},
-		LastPosition: models.Location{21.789, 91.238},
+		LastPosition: models.Location{Latitude: 21.789, Longitude: 91.238},
 		ReportedBy:   1,
 		Image:        nil,
 	}}
