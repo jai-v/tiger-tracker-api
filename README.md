@@ -5,7 +5,7 @@ Microservice for tracking the population of tigers in the wild
     go 1.22
     docker
 
-## Environment variables for local development:
+## Set below environment variables:
     export PATH=$(go env GOPATH)/bin:$PATH
     export GO111MODULE=on
     export DB_HOST=localhost
@@ -13,6 +13,7 @@ Microservice for tracking the population of tigers in the wild
     export DB_USER=tiger
     export DB_PASSWORD=kitten
     export DB_NAME=tigerhall
+    export MIGRATION_CONTEXT=local
 
 ## Commands:
 
@@ -37,3 +38,8 @@ Microservice for tracking the population of tigers in the wild
 | Environment | URL                                                           |
 |-------------|---------------------------------------------------------------|
 | Local       | http://localhost:8080/api/tiger-tracker/v1/swagger/index.html |
+
+### To generate or update mocks
+    //Install mockgen
+    go install go.uber.org/mock/mockgen@latest
+
