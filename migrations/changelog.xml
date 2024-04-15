@@ -91,4 +91,28 @@
         <addUniqueConstraint tableName="tiger_details" columnNames="name"/>
     </changeSet>
 
+    <!-- inserts the test data for local context only. todo: replace this with csv load data instead-->
+    <changeSet id="7" author="jaikumar" context="local">
+        <sql>
+            insert into user_details(user_name, password_hash, email) values("test", "test-hash", "test@test.com");
+
+            insert into tiger_details(name, dob) values("raja","1997-04-01");
+            insert into tiger_details(name, dob) values("shera","1998-01-02");
+            insert into tiger_details(name, dob) values("timon","1992-07-15");
+            insert into tiger_details(name, dob) values("pumba","1995-09-30");
+            insert into tiger_details(name, dob) values("pooh","2000-02-27");
+
+            insert into tiger_sightings(tiger_id, last_seen, last_position, user_id) values(1, "2024-04-14T01:59:59", ST_GeomFromText('POINT(21.67890 91.54789)'), 1);
+            insert into tiger_sightings(tiger_id, last_seen, last_position, user_id) values(1, "2024-04-14T02:59:59", ST_GeomFromText('POINT(21.67890 91.54789)'), 1);
+            insert into tiger_sightings(tiger_id, last_seen, last_position, user_id) values(2, "2024-04-14T03:59:59", ST_GeomFromText('POINT(21.67890 91.54789)'), 1);
+            insert into tiger_sightings(tiger_id, last_seen, last_position, user_id) values(2, "2024-04-14T04:59:59", ST_GeomFromText('POINT(21.67890 91.54789)'), 1);
+            insert into tiger_sightings(tiger_id, last_seen, last_position, user_id) values(3, "2024-04-14T05:59:59", ST_GeomFromText('POINT(21.67890 91.54789)'), 1);
+            insert into tiger_sightings(tiger_id, last_seen, last_position, user_id) values(3, "2024-04-14T06:59:59", ST_GeomFromText('POINT(21.67890 91.54789)'), 1);
+            insert into tiger_sightings(tiger_id, last_seen, last_position, user_id) values(4, "2024-04-14T07:59:59", ST_GeomFromText('POINT(21.67890 91.54789)'), 1);
+            insert into tiger_sightings(tiger_id, last_seen, last_position, user_id) values(4, "2024-04-14T08:59:59", ST_GeomFromText('POINT(21.67890 91.54789)'), 1);
+            insert into tiger_sightings(tiger_id, last_seen, last_position, user_id) values(5, "2024-04-14T09:59:59", ST_GeomFromText('POINT(21.67890 91.54789)'), 1);
+            insert into tiger_sightings(tiger_id, last_seen, last_position, user_id) values(5, "2024-04-14T10:59:59", ST_GeomFromText('POINT(21.67890 91.54789)'), 1);
+        </sql>
+    </changeSet>
+
 </databaseChangeLog>
