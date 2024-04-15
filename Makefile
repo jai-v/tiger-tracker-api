@@ -1,8 +1,12 @@
+PROJECT := "tiger-tracker-api"
 start_db:
-	docker-compose -f ./docker-compose.yml up mysqldb --wait
+	docker-compose --project-name $(PROJECT) -f ./docker-compose.yml up mysqldb --wait
 
 make migrate_db:
-	docker-compose -f ./docker-compose.yml up mysqldb-migrate
+	docker-compose --project-name $(PROJECT) -f ./docker-compose.yml up mysqldb-migrate
 
 make run:
-	docker-compose -f ./docker-compose.yml up tiger-tracker-api
+	docker-compose --project-name $(PROJECT) -f ./docker-compose.yml up tiger-tracker-api --build --force-recreate
+
+make stop:
+	docker-compose --project-name $(PROJECT) -f ./docker-compose.yml down
