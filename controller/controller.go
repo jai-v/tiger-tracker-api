@@ -8,7 +8,6 @@ import (
 	"strconv"
 	"tiger-tracker-api/apiError"
 	"tiger-tracker-api/service"
-	"tiger-tracker-api/service/models"
 )
 
 type AppController interface {
@@ -71,12 +70,11 @@ func (h appController) ListAllTigers(ctx *gin.Context) {
 		return
 	}
 
-	tigerSightings, err := h.appService.GetAllTigersWithRecentSightingsFirst(ctx, pageNo, pageSize)
+	response, err := h.appService.GetAllTigersWithRecentSightingsFirst(ctx, pageNo, pageSize)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, apiError.InternalServerError)
 		return
 	}
-	response := models.ListTigersResponse{Tigers: tigerSightings}
 	ctx.JSON(http.StatusOK, response)
 	return
 }

@@ -5,11 +5,11 @@ import (
 	"tiger-tracker-api/apiError"
 	"tiger-tracker-api/logging"
 	"tiger-tracker-api/repository"
-	"tiger-tracker-api/repository/models"
+	serviceModels "tiger-tracker-api/service/models"
 )
 
 type AppService interface {
-	GetAllTigersWithRecentSightingsFirst(ctx *gin.Context, pageNumber, pageSize int) ([]models.TigerDetailWithSightings, error)
+	GetAllTigersWithRecentSightingsFirst(ctx *gin.Context, pageNumber, pageSize int) (serviceModels.ListTigersResponse, error)
 }
 
 type appService struct {
@@ -20,12 +20,13 @@ func NewAppService(appRepository repository.AppRepository) AppService {
 	return appService{appRepository: appRepository}
 }
 
-func (service appService) GetAllTigersWithRecentSightingsFirst(ctx *gin.Context, pageNumber, pageSize int) ([]models.TigerDetailWithSightings, error) {
-	logger := logging.GetLogger().WithField("Package", "Service").WithField("Method", "GetAllTigersInDescendingOrderOfLastSeen")
+func (service appService) GetAllTigersWithRecentSightingsFirst(ctx *gin.Context, pageNumber, pageSize int) (serviceModels.ListTigersResponse, error) {
+	logger := logging.GetLogger().WithField("Package", "Service").WithField("Method", "GetAllTigersWithRecentSightingsFirst")
 	tigerSightings, err := service.appRepository.GetRecentTigerSightings(ctx, pageNumber, pageSize)
 	if err != nil {
 		logger.Errorf("failed to fetch recent sightings of tiger from db, apiError:%v", err)
-		return nil, apiError.InternalServerError
+		return serviceModels.ListTigersResponse{}, apiError.InternalServerError
 	}
-	return tigerSightings, nil
+	response := serviceModels.ListTigersResponse{Tigers: tigerSightings}
+	return response, nil
 }
