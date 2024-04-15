@@ -17,14 +17,20 @@ Microservice for tracking the population of tigers in the wild
 
 ## Commands:
 
-### To start db
+### To start database
     make start_db
 
 ### To run migrations
     make migrate_db
 
-### To run service
+### To run the API service along with database & migration
     make run
+    #once done try hitting the swagger url for api documentation
+    #if you get internal server error,then run `make migrate_db` & try again.
+
+
+### To stop API service & database
+    make stop
 
 ### To generate swagger docs
     //Install Swagger
