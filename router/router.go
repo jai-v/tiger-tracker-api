@@ -41,10 +41,6 @@ func Init(configData *configuration.ConfigData) *gin.Engine {
 	if dbErr != nil {
 		logger.Fatalf("could not connect to db, error:%v", dbErr)
 	}
-	pingErr := db.Ping()
-	if pingErr != nil {
-		logger.Fatalf("could not ping db, error:%v", pingErr)
-	}
 
 	r := gin.New()
 	appRepository := repository.NewAppRepository(db)
@@ -61,6 +57,8 @@ func Init(configData *configuration.ConfigData) *gin.Engine {
 		}
 
 		routerGroup.GET("/tiger-tracker/health", appController.HealthCheck)
+		//TODO: Create and place a middleware for token introspection
+		//TODO: Create and place a middleware to support CORS & prevent CSRF attack
 		routerGroup.GET("/tiger-tracker/v1/tigers", appController.ListAllTigers)
 	}
 
