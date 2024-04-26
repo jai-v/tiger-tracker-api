@@ -13,24 +13,58 @@ Microservice for tracking the population of tigers in the wild
     export DB_USER=tiger
     export DB_PASSWORD=kitten
     export DB_NAME=tigerhall
+    export DB_ROOT_PASSWORD=pasword
+    export WEBAPP_HOST=localhost
+    export WEBAPP_PORT=5001
     export MIGRATION_CONTEXT=local
+    export HYDRA_DB_USER=hydrauser
+    export HYDRA_DB_PASSWORD=secret
+    export HYDRA_DB_NAME=hydradb
+    export HYDRA_DB_PORT=5432
+    export HYDRA_URLS_LOGIN=http://$WEBAPP_HOST:$WEBAPP_PORT/authentication/login
+    export HYDRA_URLS_CONSENT=http://$WEBAPP_HOST:$WEBAPP_PORT/authentication/consent
+    export HYDRA_SERVE_PUBLIC_HOST=0.0.0.0
+    export HYDRA_HOST=localhost
+    export HYDRA_PUBLIC_PORT=4444
+    export HYDRA_ADMIN_PORT=4445
+    export ADMINER_PORT=9000
+    export HYDRA_CLIENT_ID=ui-web
+    export HYDRA_CLIENT_SECRET=topsecret
+    
 
 ## Commands:
 
-### To start database
+### To run the WebApp with API Service & Hydra
+    make run
+
+    #run the below docker command (one time activity)
+    docker-compose exec hydra hydra clients create \
+    --endpoint http://127.0.0.1:4445/ \
+    --name Tiger Tracker \
+    --id ui-web \
+    --secret topsecret \
+    --grant-types authorization_code,refresh_token \
+    --response-types code,id_token \
+    --callbacks http://localhost:5001/callback \
+    --token-endpoint-auth-method client_secret_post \
+    --scope offline
+
+    #open below url in a browser:
+    http://localhost:5001
+
+    #login with
+    #username: testuser
+    #password: testuser
+
+### To stop all services
+    make stop
+
+### To start only database
     make start_db
 
-### To run migrations
+### To run the migrations
     make migrate_db
 
-### To run the API service along with database & migration
-    make run
-    #once done try hitting the swagger url for api documentation
-    #if you get internal server error,then run `make migrate_db` & try again.
-
-
-### To stop API service & database
-    make stop
 
 ### To generate swagger docs
     //Install Swagger
