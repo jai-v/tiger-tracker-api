@@ -9,11 +9,9 @@ definitions:
   apiError.ErrorCode:
     enum:
     - ERR_BAD_REQUEST
-    - ERR_INTERNAL_SERVER_ERROR
     type: string
     x-enum-varnames:
     - BadRequestErrorCode
-    - InternalServerErrorCode
   models.ListTigersResponse:
     properties:
       tigers:
@@ -28,6 +26,11 @@ definitions:
       longitude:
         type: number
     type: object
+  models.SignupResponse:
+    properties:
+      status:
+        type: string
+    type: object
   models.TigerDetailWithSightings:
     properties:
       dob:
@@ -36,8 +39,6 @@ definitions:
         $ref: '#/definitions/models.Location'
       lastSeen:
         type: string
-      tigerId:
-        type: integer
       tigerName:
         type: string
     type: object
@@ -55,6 +56,75 @@ paths:
       summary: Checks API Service health
       tags:
       - Health
+  /v1/login/password:
+    post:
+      consumes:
+      - application/x-www-form-urlencoded
+      description: Accepts the login consent when credentials are correct and redirects
+        to the consent page.
+      parameters:
+      - description: login challenge
+        in: formData
+        name: login_challenge
+        required: true
+        type: string
+      - description: login user name
+        in: formData
+        name: user_name
+        required: true
+        type: string
+      - description: login password
+        in: formData
+        name: password
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "302":
+          description: Found
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/apiError.APIError'
+      summary: Identity provider api to verify login.
+      tags:
+      - Login
+  /v1/signup:
+    post:
+      consumes:
+      - application/x-www-form-urlencoded
+      description: Creates a new user.
+      parameters:
+      - description: user name
+        in: formData
+        name: user_name
+        required: true
+        type: string
+      - description: email
+        in: formData
+        name: email
+        required: true
+        type: string
+      - description: password
+        in: formData
+        name: password
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.SignupResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/apiError.APIError'
+      summary: Creates a new user.
+      tags:
+      - Signup
   /v1/tigers:
     get:
       description: It is a paginated endpoint. The tigers are sorted by the last time
@@ -70,6 +140,11 @@ paths:
         name: pageSize
         required: true
         type: integer
+      - description: starts with Bearer
+        in: header
+        name: Authorization
+        required: true
+        type: string
       produces:
       - application/json
       responses:
