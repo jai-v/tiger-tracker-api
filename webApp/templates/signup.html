@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Login</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="../static/bootstrap.min.css" rel="stylesheet" media="screen">
+</head>
+<body>
+<div class="container">
+    <h1 class="h3 mb-3 font-weight-normal">Signup</h1>
+    <br>
+    <form action="{{ signup_url }}" method="post">
+        <label class="form-inline">
+            <input type="email" placeholder="Email" name="email"  required autofocus />
+        </label>
+        <label class="form-inline">
+            <input type="text" placeholder="Username" name="user_name" min="5" pattern="[a-zA-Z0-9]+" required />
+        </label>
+        <label class="form-inline">
+            <input type="password" placeholder="Password" name="password" min="7" max="70" required />
+        </label>
+        {% if error %}
+        <label class="form-inline">
+            <p class="alert-warning">{{ error }}</p>
+        </label>
+        {% endif %}
+        <input class="btn btn-primary" type="submit" value="Signup"/>
+    </form>
+</div>
+</body>
+</html>

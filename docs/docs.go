@@ -32,6 +32,107 @@ const docTemplate = `{
                 }
             }
         },
+        "/v1/login/password": {
+            "post": {
+                "description": "Accepts the login consent when credentials are correct and redirects to the consent page.",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Login"
+                ],
+                "summary": "Identity provider api to verify login.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "login challenge",
+                        "name": "login_challenge",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "login user name",
+                        "name": "user_name",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "login password",
+                        "name": "password",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "302": {
+                        "description": "Found"
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/apiError.APIError"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/signup": {
+            "post": {
+                "description": "Creates a new user.",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Signup"
+                ],
+                "summary": "Creates a new user.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "user name",
+                        "name": "user_name",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "email",
+                        "name": "email",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "password",
+                        "name": "password",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/models.SignupResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/apiError.APIError"
+                        }
+                    }
+                }
+            }
+        },
         "/v1/tigers": {
             "get": {
                 "description": "It is a paginated endpoint. The tigers are sorted by the last time they were seen.",
@@ -55,6 +156,13 @@ const docTemplate = `{
                         "description": "page size",
                         "name": "pageSize",
                         "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "starts with Bearer",
+                        "name": "Authorization",
+                        "in": "header",
                         "required": true
                     }
                 ],
@@ -96,12 +204,10 @@ const docTemplate = `{
         "apiError.ErrorCode": {
             "type": "string",
             "enum": [
-                "ERR_BAD_REQUEST",
-                "ERR_INTERNAL_SERVER_ERROR"
+                "ERR_BAD_REQUEST"
             ],
             "x-enum-varnames": [
-                "BadRequestErrorCode",
-                "InternalServerErrorCode"
+                "BadRequestErrorCode"
             ]
         },
         "models.ListTigersResponse": {
@@ -126,6 +232,14 @@ const docTemplate = `{
                 }
             }
         },
+        "models.SignupResponse": {
+            "type": "object",
+            "properties": {
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
         "models.TigerDetailWithSightings": {
             "type": "object",
             "properties": {
@@ -137,9 +251,6 @@ const docTemplate = `{
                 },
                 "lastSeen": {
                     "type": "string"
-                },
-                "tigerId": {
-                    "type": "integer"
                 },
                 "tigerName": {
                     "type": "string"

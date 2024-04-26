@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Consent</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="../static/bootstrap.min.css" rel="stylesheet" media="screen">
+</head>
+<body>
+
+<form class="form-inline" method="post" action="/authentication/consent">
+    {% if consent_challenge %}
+    <h1 class="h3 mb-3 font-weight-normal">Authorization</h1>
+    <p></p>
+    {% for n in range(requested_scopes| length) %}
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" name="grant_scope" value="{{ requested_scopes[n] }}" id="{{ n }}" checked>
+        <label class="form-check-label" for="{{ requested_scopes[n] }}">{{ requested_scopes[n] }}</label>
+    </div>
+    {% endfor %}
+    <input type="hidden" name="consent_challenge" value="{{ consent_challenge }}">
+    <button class="btn btn-lg btn-primary btn-block" type="submit">Authorize</button>
+    {% endif %}
+</form>
+
+</body>
+</html>
