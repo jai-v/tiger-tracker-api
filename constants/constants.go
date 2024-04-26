@@ -8,3 +8,12 @@ const (
 	DB_USER          = "DB_USER"
 	DB_PASSWORD      = "DB_PASSWORD"
 )
+
+const (
+	PASSWORD_HASH_COST = 12
+)
+
+const (
+	AUTHORIZATION_HEADER_KEY = "Authorization"
+	COOKIE_ACCESS_TOKEN      = "access_token"
+)
