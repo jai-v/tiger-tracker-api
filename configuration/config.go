@@ -32,4 +32,5 @@ type ConfigData struct {
 	Environment      string                  `json:"environment"`
 	ListenPort       string                  `json:"listenPort"`
 	DbConnectionPool models.DbConnectionPool `json:"dbConnectionPool"`
+	OauthConfig      models.OauthConfig      `json:"oauthConfig"`
 }

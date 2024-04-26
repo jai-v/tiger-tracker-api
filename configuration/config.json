@@ -5,5 +5,8 @@
     "maxOpenConnections": 100,
     "maxIdleConnections": 5,
     "maxConnectionLifetimeInMinutes": 3
+  },
+  "oauthConfig": {
+    "adminBaseUrl": "http://hydra:4445"
   }
 }
