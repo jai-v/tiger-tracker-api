@@ -114,5 +114,10 @@
             insert into tiger_sightings(tiger_id, last_seen, last_position, user_id) values(5, "2024-04-14T10:59:59", ST_GeomFromText('POINT(21.67890 91.54789)'), 1);
         </sql>
     </changeSet>
+    <changeSet id="8" author="jaikumar" context="local">
+        <sql>
+            insert into user_details(user_name, password_hash, email) values("testuser", "$2a$12$5E0FKFF0Ynt9zlrajfb.5epBzsJA/Ez2KVWRuyePwihESI0g2LtLy", "testuser@test.com");
+        </sql>
+    </changeSet>
 
 </databaseChangeLog>
