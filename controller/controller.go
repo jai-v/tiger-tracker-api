@@ -7,12 +7,16 @@ import (
 	"net/http"
 	"strconv"
 	"tiger-tracker-api/apiError"
+	"tiger-tracker-api/controller/models"
+	"tiger-tracker-api/logging"
 	"tiger-tracker-api/service"
 )
 
 type AppController interface {
 	HealthCheck(ctx *gin.Context)
 	ListAllTigers(ctx *gin.Context)
+	LoginByPassword(ctx *gin.Context)
+	Signup(ctx *gin.Context)
 }
 
 type appController struct {
@@ -54,6 +58,7 @@ func (ac appController) readQueryParamAsInt(ctx *gin.Context, name string) (int,
 // @Produce json
 // @Param pageNo query int true "page number"
 // @Param pageSize query int true "page size"
+// @Param Authorization header string true "starts with Bearer"
 // @Success 200 {object} models.ListTigersResponse
 // @Failure 400 {object} apiError.APIError
 // @Failure 500 {object} apiError.APIError
@@ -77,4 +82,66 @@ func (ac appController) ListAllTigers(ctx *gin.Context) {
 	}
 	ctx.JSON(http.StatusOK, response)
 	return
+}
+
+// Login By Password
+// @Tags Login
+// @Summary Identity provider api to verify login.
+// @Description Accepts the login consent when credentials are correct and redirects to the consent page.
+// @Accept application/x-www-form-urlencoded
+// @Param login_challenge formData string true "login challenge"
+// @Param user_name formData string true "login user name"
+// @Param password formData string true "login password"
+// @Produce json
+// @Success 302
+// @Failure 422 {object} apiError.APIError
+// @Router /v1/login/password [post]
+func (ac appController) LoginByPassword(ctx *gin.Context) {
+	logger := logging.GetLogger().WithField("Package", "Controller").WithField("Method", "LoginByPassword")
+	rememberMe, _ := strconv.ParseBool(ctx.Request.FormValue("remember_me"))
+	req := models.LoginByPasswordRequest{
+		LoginChallenge: ctx.Request.FormValue("login_challenge"),
+		Username:       ctx.Request.FormValue("user_name"),
+		Password:       ctx.Request.FormValue("password"),
+		RememberMe:     rememberMe,
+	}
+	//TODO: validate request
+	redirectTo, err := ac.appService.AuthenticateLoginByPassword(ctx, req)
+	if err != nil {
+		logger.Errorf("failed to authenticate, error: %s", err)
+		ctx.AbortWithError(http.StatusUnprocessableEntity, err)
+		return
+	}
+	ctx.Redirect(http.StatusFound, redirectTo)
+	return
+}
+
+// Signup
+// @Tags Signup
+// @Summary Creates a new user.
+// @Description Creates a new user.
+// @Produce json
+// @Accept application/x-www-form-urlencoded
+// @Param user_name formData string true "user name"
+// @Param email formData string true "email"
+// @Param password formData string true "password"
+// @Success 201 {object} models.SignupResponse
+// @Failure 500 {object} apiError.APIError
+// @Router /v1/signup [post]
+func (ac appController) Signup(ctx *gin.Context) {
+	logger := logging.GetLogger().WithField("Package", "Controller").WithField("Method", "Signup")
+	signupRequest := models.SignupRequest{
+		Username: ctx.Request.FormValue("user_name"),
+		Email:    ctx.Request.FormValue("email"),
+		Password: ctx.Request.FormValue("password"),
+	}
+
+	//TODO: validate request
+	signupResponse, apiErr := ac.appService.CreateNewUser(ctx, signupRequest)
+	if apiErr != nil {
+		logger.Errorf("failed to create new user, error: %s", apiErr)
+		ctx.AbortWithStatusJSON(apiErr.HttpStatusCode, apiErr)
+		return
+	}
+	ctx.JSON(http.StatusCreated, signupResponse)
 }
