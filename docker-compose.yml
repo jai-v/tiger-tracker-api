@@ -5,6 +5,8 @@ services:
     cap_add:
       - SYS_NICE
     restart: always
+    networks:
+      - ory-hydra-network
     environment:
       - MYSQL_DATABASE=$DB_NAME
       - MYSQL_USER=$DB_USER
@@ -17,6 +19,9 @@ services:
 
   mysqldb-migrate:
     image: liquibase/liquibase
+    restart: on-failure
+    networks:
+      - ory-hydra-network
     volumes:
       - ./migrations:/liquibase/changelog
       - ./migrations/resources:/liquibase/changelog/resources
@@ -38,11 +43,13 @@ services:
 
   tiger-tracker-api:
     image: tiger-tracker-api
+    networks:
+      - ory-hydra-network
     build:
       context: .
       dockerfile: Dockerfile
     ports:
-      - '8080:8080'
+      - "8080:8080"
     environment:
       - DB_HOST=mysqldb
       - DB_PORT=$DB_PORT
@@ -56,6 +63,94 @@ services:
       - ./configuration:/home/tigerhall/configuration
     command: [ "./tiger-tracker-api" ]
 
+  postgresd:
+    image: postgres:11.8
+    restart: on-failure
+    networks:
+      - ory-hydra-network
+    ports:
+      - "${HYDRA_DB_PORT}:5432"
+    environment:
+      - POSTGRES_USER=$HYDRA_DB_USER
+      - POSTGRES_PASSWORD=$HYDRA_DB_PASSWORD
+      - POSTGRES_DB=$HYDRA_DB_NAME
+    volumes:
+      - postgresd:/var/lib/postgresql/data
+
+  hydra-migrate:
+    image: oryd/hydra:v1.11.10
+    restart: on-failure
+    networks:
+      - ory-hydra-network
+    command:
+      migrate sql -e --yes
+    environment:
+      - DSN=postgres://hydrauser:secret@postgresd:5432/hydradb?sslmode=disable&max_conns=20&max_idle_conns=4
+    depends_on:
+      - postgresd
+
+  hydra:
+    image: oryd/hydra:v1.11.10
+    restart: on-failure
+    networks:
+      - ory-hydra-network
+    ports:
+      - "${HYDRA_PUBLIC_PORT}:4444" # Public port
+      - "${HYDRA_ADMIN_PORT}:4445" # Admin port
+      - "5555:5555" # Port for hydra token user, testing purpose only
+    command:
+      serve all --dangerous-force-http
+    environment:
+      # https://www.ory.sh/hydra/docs/reference/configuration
+      # https://github.com/ory/hydra/blob/aeecfe1c8f/test/e2e/docker-compose.yml
+      - SECRETS_SYSTEM=this-is-the-primary-secret
+      - URLS_LOGIN=$HYDRA_URLS_LOGIN # Sets the login endpoint of the User Login & Consent flow.
+      - URLS_CONSENT=$HYDRA_URLS_CONSENT # Sets the consent endpoint of the User Login & Consent flow.
+
+      # set to Hydra public domain
+      - URLS_SELF_PUBLIC=http://localhost:$HYDRA_PUBLIC_PORT # to public endpoint
+      - URLS_SELF_ISSUER=http://localhost:$HYDRA_PUBLIC_PORT # to public endpoint
+      - DSN=postgres://$HYDRA_DB_USER:$HYDRA_DB_PASSWORD@postgresd:$HYDRA_DB_PORT/hydradb?sslmode=disable&max_conns=20&max_idle_conns=4
+      - SERVE_PUBLIC_PORT=$HYDRA_PUBLIC_PORT
+      - SERVE_PUBLIC_HOST=$HYDRA_SERVE_PUBLIC_HOST
+      - SERVE_PUBLIC_CORS_ENABLED=false
+      - SERVE_ADMIN_PORT=$HYDRA_ADMIN_PORT
+      - LOG_LEVEL=debug
+
+  adminer:
+    image: adminer
+    restart: always
+    networks:
+      - ory-hydra-network
+    ports:
+      - "${ADMINER_PORT}:8080"
+
+  webapp:
+    image: webapp
+    networks:
+      - ory-hydra-network
+    build:
+      context: .
+      dockerfile: Dockerfile-webapp
+    ports:
+      - "${WEBAPP_PORT}:5001"
+    environment:
+      - HYDRA_CLIENT_ID=$HYDRA_CLIENT_ID
+      - HYDRA_CLIENT_SECRET=$HYDRA_CLIENT_SECRET
+      - WEBAPP_HOST=$WEBAPP_HOST
+      - WEBAPP_PORT=$WEBAPP_PORT
+      - HYDRA_HOST=$HYDRA_HOST
+      - HYDRA_PUBLIC_PORT=$HYDRA_PUBLIC_PORT
+      - HYDRA_ADMIN_PORT=$HYDRA_ADMIN_PORT
+    depends_on:
+        - tiger-tracker-api
+
 volumes:
   mysqldb:
     driver: local
+  postgresd:
+    driver: local
+
+networks:
+  ory-hydra-network:
+    name: ory-hydra-net
