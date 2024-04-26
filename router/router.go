@@ -8,12 +8,14 @@ import (
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 	"os"
+	"tiger-tracker-api/clients/oauth"
 	"tiger-tracker-api/configuration"
 	"tiger-tracker-api/configuration/models"
 	"tiger-tracker-api/constants"
 	"tiger-tracker-api/controller"
 	"tiger-tracker-api/docs"
 	"tiger-tracker-api/logging"
+	"tiger-tracker-api/middlewares"
 	"tiger-tracker-api/repository"
 	"tiger-tracker-api/service"
 )
@@ -44,8 +46,11 @@ func Init(configData *configuration.ConfigData) *gin.Engine {
 
 	r := gin.New()
 	appRepository := repository.NewAppRepository(db)
-	appService := service.NewAppService(appRepository)
+	oauthClient := oauth.NewOauthClient(configData.OauthConfig.AdminBaseUrl)
+	appService := service.NewAppService(appRepository, oauthClient)
 	appController := controller.NewAppController(appService)
+
+	tokenIntrospectionMiddleware := middlewares.NewTokenIntrospectionMiddleware(oauthClient)
 
 	routerGroup := r.Group("/api")
 	{
@@ -59,7 +64,9 @@ func Init(configData *configuration.ConfigData) *gin.Engine {
 		routerGroup.GET("/tiger-tracker/health", appController.HealthCheck)
 		//TODO: Create and place a middleware for token introspection
 		//TODO: Create and place a middleware to support CORS & prevent CSRF attack
-		routerGroup.GET("/tiger-tracker/v1/tigers", appController.ListAllTigers)
+		routerGroup.GET("/tiger-tracker/v1/tigers", tokenIntrospectionMiddleware.ValidateToken(), appController.ListAllTigers)
+		routerGroup.POST("/tiger-tracker/v1/signup", appController.Signup)
+		routerGroup.POST("/tiger-tracker/v1/login", appController.LoginByPassword)
 	}
 
 	return r
